@@ -1,0 +1,38 @@
+server {
+    
+    listen {{SERVER_PORT}};
+    server_name  {{SERVER_NAME}};
+    access_log  /var/log/nginx/example.log;
+    error_log /var/log/nginx/example.error.log;
+
+    location {{MOODLE_PATH}} {  
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Host {{MOODLE_URL}};
+        proxy_set_header X-Forwarded-Server {{MOODLE_URL}};
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass  {{MOODLE_URL}};
+    }
+
+    location {{API_PATH}} {
+        proxy_pass         {{API_URL}};
+        proxy_set_header   X-Forwarded-For $remote_addr;
+        proxy_set_header   Host $http_host;
+    }
+    
+    location {{CLIENT_PATH}} {
+        proxy_pass         {{CLIENT_URL}};
+        proxy_set_header   X-Forwarded-For $remote_addr;
+        proxy_set_header   Host $http_host;
+    }
+    
+    # This location is targeting to the static folder files
+    # Im doing it to not compile the client every time when the client changes its url
+    # The current static files folder is vplclient_static
+    location {{CLIENT_STATIC_PATH}} {
+        proxy_pass         {{CLIENT_URL}}{{CLIENT_STATIC_PATH}};
+        proxy_set_header   X-Forwarded-For $remote_addr;
+        proxy_set_header   Host $http_host;
+    }
+
+}
