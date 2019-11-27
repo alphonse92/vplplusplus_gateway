@@ -1,6 +1,13 @@
 server {
     
+    {% if SERVER_PORT == "443" or  SERVER_PORT == 443 %}
+    listen 443 ssl;
+    ssl_certificate        {{CERT}};
+    ssl_certificate_key    {{CERT_KEY}};
+    {% else %}
     listen {{SERVER_PORT}};
+    {% endif %}
+
     server_name  {{SERVER_NAME}};
     access_log  /var/log/nginx/example.log;
     error_log /var/log/nginx/example.error.log;
