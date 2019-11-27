@@ -31,22 +31,23 @@ server {
     }
 
     location {{API_PATH}} {
-        proxy_pass         {{API_URL}};
         proxy_set_header   X-Forwarded-For $remote_addr;
         proxy_set_header   Host $http_host;
+        proxy_pass         {{API_URL}};
     }
     
     location {{CLIENT_PATH}} {
-        proxy_pass         {{CLIENT_URL}};
+        rewrite {{CLIENT_PATH}}(.*) /$1 break;
         proxy_set_header   X-Forwarded-For $remote_addr;
         proxy_set_header   Host $http_host;
+        proxy_pass         {{CLIENT_URL}};
     }
 
     location {{JAIL_PATH}} {
         rewrite {{JAIL_PATH}}/(.*) /$1 break;
-        proxy_pass         {{JAIL_URL}};
         proxy_set_header   X-Forwarded-For $remote_addr;
         proxy_set_header   Host $http_host;
+        proxy_pass         {{JAIL_URL}};
     }
 
     #Reverse proxy for jail web socket
