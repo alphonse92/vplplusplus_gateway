@@ -23,6 +23,7 @@ server {
     error_log /var/log/nginx/example.error.log;
 
     location {{MOODLE_PATH}} {  
+        resolver 127.0.0.1 valid=30s;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-Host {{MOODLE_URL}};
         proxy_set_header X-Forwarded-Server {{MOODLE_URL}};
@@ -31,12 +32,14 @@ server {
     }
 
     location {{API_PATH}} {
+        resolver 127.0.0.1 valid=30s;
         proxy_set_header   X-Forwarded-For $remote_addr;
         proxy_set_header   Host $http_host;
         proxy_pass         {{API_URL}};
     }
     
     location {{CLIENT_PATH}} {
+        resolver 127.0.0.1 valid=30s;
         rewrite {{CLIENT_PATH}}(.*) /$1 break;
         proxy_set_header   X-Forwarded-For $remote_addr;
         proxy_set_header   Host $http_host;
@@ -44,6 +47,7 @@ server {
     }
 
     location {{JAIL_PATH}} {
+        resolver 127.0.0.1 valid=30s;
         rewrite {{JAIL_PATH}}/(.*) /$1 break;
         proxy_set_header   X-Forwarded-For $remote_addr;
         proxy_set_header   Host $http_host;
@@ -52,6 +56,7 @@ server {
 
     #Reverse proxy for jail web socket
     location ~ ^/([0-9]+)/monitor {
+        resolver 127.0.0.1 valid=30s;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_pass         $scheme://{{JAIL_MONITOR_URL}}:$proxy_port;
@@ -62,6 +67,7 @@ server {
     # Im doing it to not compile the client every time when the client changes its url
     # The current static files folder is vplclient_static
     location {{CLIENT_STATIC_PATH}} {
+        resolver 127.0.0.1 valid=30s;
         proxy_pass         {{CLIENT_URL}}{{CLIENT_STATIC_PATH}};
         proxy_set_header   X-Forwarded-For $remote_addr;
         proxy_set_header   Host $http_host;
